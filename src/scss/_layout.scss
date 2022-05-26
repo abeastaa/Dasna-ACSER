@@ -1,0 +1,10 @@
+.wrapper {
+  background-image: url('../assets/images/bg4.jpg');
+  // background-repeat: no-repeat;
+  background-position: center;
+  background-attachment: fixed;
+  width: 100%;
+  @include ltr-rtl('padding-left', var(--cui-sidebar-occupy-start, 0));
+  will-change: auto;
+  @include transition(padding 0.15s);
+}
