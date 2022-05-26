@@ -58,7 +58,7 @@ const Dropdowns = () => {
                         <CDropdownItem href="#">Separated link</CDropdownItem>
                       </CDropdownMenu>
                     </CDropdown>
-                  ),
+                  )
                 )}
               </>
             </DocsExample>
@@ -97,7 +97,7 @@ const Dropdowns = () => {
                         <CDropdownItem href="#">Separated link</CDropdownItem>
                       </CDropdownMenu>
                     </CDropdown>
-                  ),
+                  )
                 )}
               </>
             </DocsExample>
