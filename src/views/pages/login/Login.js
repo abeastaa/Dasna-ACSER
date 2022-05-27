@@ -1,5 +1,11 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, useContext } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+// ** Contexts
+import { LoginContext } from '../../../contexts/loginContext'
+import { EmailsContext } from '../../../contexts/emailsContext'
+// ** Custom Hooks
+import useRequest from '../../../utility/useRequest'
+// import { useNavigate } from 'react-router-dom'
 import {
   CButton,
   CCard,
@@ -16,12 +22,32 @@ import {
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 
-const Login = () => {
+function Login() {
+  // ** Hooks
+  const navigate = useNavigate()
+  const { request } = useRequest()
+  const { setToken } = useContext(LoginContext)
+  const { setEmails } = useContext(EmailsContext)
+
+  const [isLoading, setIsLoading] = useState(false)
+  const [data, setData] = useState({ username: '', password: '' })
+  const handleSubmit = async () => {
+    setIsLoading(true)
+    const res = await request(false, '/Dashboard', 'POST', data)
+    console.log(res)
+    if (res.status === 200) {
+      setToken(true)
+      setEmails(res.data)
+      navigate('/')
+    } else {
+      setIsLoading(false)
+    }
+  }
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
         <CRow className="justify-content-center">
-          <CCol md={8}>
+          <CCol md={6} lg={5}>
             <CCardGroup>
               <CCard className="p-4">
                 <CCardBody>
@@ -32,34 +58,52 @@ const Login = () => {
                       <CInputGroupText>
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
-                      <CFormInput placeholder="Username" autoComplete="username" />
+                      <CFormInput
+                        name="username"
+                        placeholder="email"
+                        type="email"
+                        value={data.username}
+                        onChange={(e) => {
+                          setData({ ...data, [e.target.name]: e.target.value })
+                        }}
+                      />
                     </CInputGroup>
                     <CInputGroup className="mb-4">
                       <CInputGroupText>
                         <CIcon icon={cilLockLocked} />
                       </CInputGroupText>
                       <CFormInput
+                        name="password"
                         type="password"
                         placeholder="Password"
                         autoComplete="current-password"
+                        value={data.password}
+                        onChange={(e) => {
+                          setData({ ...data, [e.target.name]: e.target.value })
+                        }}
                       />
                     </CInputGroup>
                     <CRow>
-                      <CCol xs={6}>
-                        <CButton color="primary" className="px-4">
+                      <CCol xs={12}>
+                        <CButton
+                          color="primary"
+                          className="w-100 px-4"
+                          disabled={isLoading}
+                          onClick={handleSubmit}
+                        >
                           Login
                         </CButton>
                       </CCol>
-                      <CCol xs={6} className="text-right">
+                      {/* <CCol xs={6} className="text-right">
                         <CButton color="link" className="px-0">
                           Forgot password?
                         </CButton>
-                      </CCol>
+                      </CCol> */}
                     </CRow>
                   </CForm>
                 </CCardBody>
               </CCard>
-              <CCard className="text-white bg-primary py-5" style={{ width: '44%' }}>
+              {/* <CCard className="text-white bg-primary py-5" style={{ width: '44%' }}>
                 <CCardBody className="text-center">
                   <div>
                     <h2>Sign up</h2>
@@ -74,7 +118,7 @@ const Login = () => {
                     </Link>
                   </div>
                 </CCardBody>
-              </CCard>
+              </CCard> */}
             </CCardGroup>
           </CCol>
         </CRow>

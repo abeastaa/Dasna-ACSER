@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
+
+// ** Contexts
+import { EmailsContext } from '../../contexts/emailsContext'
 
 // ** Custom Hooks
 import useRequest from '../../utility/useRequest'
@@ -21,19 +24,19 @@ import { SortAmountDesc, SortAmountAsc } from '@styled-icons/icomoon/'
 
 const Dashboard = () => {
   // ** Hooks
-  const { jwtRequests } = useRequest()
-
+  const { request } = useRequest()
   // ** states
   const [data, setData] = useState(null)
 
+  const { emails } = useContext(EmailsContext)
   // ** get initial data from back-end
-  const handleGetData = async () => {
-    const res = jwtRequests('', 'GET')
-    setData(null)
-  }
+  // const handleGetData = async () => {
+  //   const res = request('', 'GET')
+  //   setData(null)
+  // }
 
   useEffect(() => {
-    handleGetData()
+    setData(emails)
   }, [])
 
   return (
