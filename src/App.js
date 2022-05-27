@@ -1,48 +1,29 @@
-import React, { Component, Suspense } from 'react'
-import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom'
+import React, { useState, useEffect, useMemo } from 'react'
 import './scss/style.scss'
+import { LoginContext } from './contexts/loginContext'
+import { EmailsContext } from './contexts/emailsContext'
 
-const loading = (
-  <div className="pt-3 text-center">
-    <div className="sk-spinner sk-spinner-pulse"></div>
-  </div>
-)
+import Routers from './routes/routes'
 
-// Containers
-const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
+function App() {
+  const [token, setToken] = useState(false)
+  const [emails, setEmails] = useState(null)
 
-// Pages
-const Login = React.lazy(() => import('./views/pages/login/Login'))
-const Register = React.lazy(() => import('./views/pages/register/Register'))
-const Page404 = React.lazy(() => import('./views/pages/page404/Page404'))
-const Page500 = React.lazy(() => import('./views/pages/page500/Page500'))
+  const providerValue = useMemo(() => {
+    return { token, setToken }
+  })
 
-class App extends Component {
-  render() {
-    const token = false
+  const providerEmail = useMemo(() => {
+    return { emails, setEmails }
+  })
 
-    return (
-      <Router>
-        <Suspense fallback={loading}>
-          <Routes>
-            {token ? (
-              <>
-                <Route exact path="/404" name="Page 404" element={<Page404 />} />
-                <Route exact path="/500" name="Page 500" element={<Page500 />} />
-                <Route exact path="*" element={<DefaultLayout />} />
-              </>
-            ) : (
-              <>
-                <Route path="/login" name="Login Page" element={<Login />} />
-                <Route path="/register" name="Register Page" element={<Register />} />
-                <Route path="*" element={<Navigate to="login" replace />} />
-              </>
-            )}
-          </Routes>
-        </Suspense>
-      </Router>
-    )
-  }
+  return (
+    <LoginContext.Provider value={providerValue}>
+      <EmailsContext.Provider value={providerEmail}>
+        <Routers />
+      </EmailsContext.Provider>
+    </LoginContext.Provider>
+  )
 }
 
 export default App
