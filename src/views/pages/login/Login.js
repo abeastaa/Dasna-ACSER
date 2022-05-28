@@ -31,17 +31,17 @@ function Login() {
 
   const [isLoading, setIsLoading] = useState(false)
   const [data, setData] = useState({ username: '', password: '' })
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     setIsLoading(true)
-    const res = await request(false, '/Dashboard', 'POST', data)
-    console.log(res)
-    if (res.status === 200) {
-      setToken(true)
-      setEmails(res.data)
-      navigate('/')
-    } else {
-      setIsLoading(false)
-    }
+    request(false, '/Dashboard', 'POST', data)
+      .then((res) => {
+        setToken(true)
+        setEmails(res.data)
+        navigate('/')
+      })
+      .catch((err) => {
+        setIsLoading(false)
+      })
   }
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
