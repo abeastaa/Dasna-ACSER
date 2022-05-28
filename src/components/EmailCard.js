@@ -11,7 +11,7 @@ import { MailSend } from '@styled-icons/remix-line/MailSend'
 //** Third Party Components
 import PropTypes from 'prop-types'
 
-function EmailCard({ status }) {
+function EmailCard({ data }) {
   //** Handle Choose Badge
   const handleBadge = (status) => {
     let badge = {}
@@ -34,17 +34,28 @@ function EmailCard({ status }) {
     return badge
   }
 
+  const handleDateTime = (date) => {
+    const newDate = new Date(date)
+    return (
+      <>
+        <small>{newDate.toDateString()}</small>
+        <br />
+        <small>{newDate.toLocaleTimeString()}</small>
+      </>
+    )
+  }
+
   return (
     <>
       <CCard className="mb-4">
         <CCardHeader className="d-flex justify-content-between">
-          <span className="font-weight-bold">Atlanta Falcons</span>
+          <span className="font-weight-bold">{data.title}</span>
           <CBadge
-            color={handleBadge(status).color}
+            color={handleBadge(data.criticality).color}
             shape="rounded-pill"
             className="px-3 d-flex align-items-center "
           >
-            {handleBadge(status).label}
+            {handleBadge(data.criticality).label}
           </CBadge>
         </CCardHeader>
         <CCardBody className="d-inline-block">
@@ -53,21 +64,19 @@ function EmailCard({ status }) {
               <QuoteAltLeft height={42} className="text-secondary" />
             </CCol>
             <CCol xs={9} className="p-0">
-              <p>lorem ipsum dolor sit amet, consectetur lorem ipsum dolor sit amet, consectetur</p>
+              <p>{data.keyWords}</p>
             </CCol>
           </CRow>
-          <div className="d-flex align-items-end justify-content-between">
-            <div>
+          <CRow className="d-flex align-items-start justify-content-between">
+            <CCol sm={7}>
               <span>
                 <MailSend height={18} className="mx-1 mb-1" />
                 Sender
               </span>
-              <h6>Abeasta Dasna</h6>
-            </div>
-            <div>
-              <small>2022/May/09</small>
-            </div>
-          </div>
+              <h6>{data.sender}</h6>
+            </CCol>
+            <CCol sm={5}>{handleDateTime(data.date)}</CCol>
+          </CRow>
         </CCardBody>
       </CCard>
     </>
@@ -75,7 +84,7 @@ function EmailCard({ status }) {
 }
 
 EmailCard.propTypes = {
-  status: PropTypes.number,
+  data: PropTypes.object,
 }
 
 export default EmailCard
