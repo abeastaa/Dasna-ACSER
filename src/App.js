@@ -6,7 +6,7 @@ import { EmailsContext } from './contexts/emailsContext'
 import Routers from './routes/routes'
 
 function App() {
-  const [token, setToken] = useState(false)
+  const [token, setToken] = useState(localStorage.getItem('token'))
   const [emails, setEmails] = useState(null)
 
   const providerValue = useMemo(() => {

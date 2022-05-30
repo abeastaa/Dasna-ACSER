@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, Suspense, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 // ** Contexts
 import { LoginContext } from '../../../contexts/loginContext'
@@ -18,30 +18,93 @@ import {
   CInputGroup,
   CInputGroupText,
   CRow,
+  CSpinner,
+  CToastBody,
+  CToastClose,
+  CToaster,
+  CToastHeader,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
+import { CToast } from '@coreui/react'
+
+// ** Logo
+import Logo from '../../../assets/images/logtrans.png'
+import NameLogo from '../../../assets/images/textlogotra.png'
+
+// ** Toast
+const createToast = (text) => {
+  return (
+    <CToast animation={true} color="danger">
+      <CToastHeader closeButton className="justify-content-between">
+        Error
+      </CToastHeader>
+      <CToastBody className="text-white">{text}</CToastBody>
+    </CToast>
+  )
+}
 
 function Login() {
   // ** Hooks
   const navigate = useNavigate()
   const { request } = useRequest()
+
   const { setToken } = useContext(LoginContext)
   const { setEmails } = useContext(EmailsContext)
 
+  const toaster = useRef()
+
   const [isLoading, setIsLoading] = useState(false)
+  const [errors, setErrors] = useState({})
+  const [toast, setToast] = useState(0)
   const [data, setData] = useState({ username: '', password: '' })
-  const handleSubmit = () => {
-    setIsLoading(true)
-    request(false, '/Dashboard', 'POST', data)
-      .then((res) => {
-        setToken(true)
-        setEmails(res.data)
-        navigate('/')
+
+  // ** Handle Change input
+  const handleChange = (e) => {
+    setData({ ...data, [e.target.name]: e.target.value })
+    if (errors[e.target.name] && e.target.value.length > 0) {
+      setErrors((prev) => {
+        delete prev[e.target.name]
+        return prev
       })
-      .catch((err) => {
-        setIsLoading(false)
-      })
+    }
+  }
+
+  // ** Handle Submit and login
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (Object.values(data).every((item) => item.length > 0)) {
+      setErrors({})
+      setIsLoading(true)
+      request(false, '/login', 'POST', data)
+        .then((res) => {
+          setIsLoading(false)
+          if (res.data.accessToken) {
+            localStorage.setItem('token', res.data.accessToken)
+            setToken(res.data.accessToken)
+            navigate('/')
+          } else {
+            setToast(createToast(res.data.message))
+          }
+        })
+        .catch((err) => {
+          if (err.response.status === 401) {
+            setToast(createToast(err.response.data.msg))
+          } else {
+            setToast(createToast('Sorry, something went wrong!'))
+          }
+          setIsLoading(false)
+        })
+    } else {
+      let newErrors = {}
+      for (const key in data) {
+        // console.log(key)
+        if (!data[key].length > 0) {
+          newErrors = { ...newErrors, [key]: `${key} is required` }
+        }
+        setErrors(newErrors)
+      }
+    }
   }
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
@@ -51,47 +114,62 @@ function Login() {
             <CCardGroup>
               <CCard className="p-4">
                 <CCardBody>
-                  <CForm>
+                  <CRow className="d-flex justify-content-center mb-5">
+                    <CCol xs={12} className="d-flex justify-content-center">
+                      <img src={Logo} alt="Logo" style={{ width: 200, height: 200 }} />
+                    </CCol>
+                    <CCol xs={12} className="d-flex justify-content-center">
+                      <img src={NameLogo} alt="Logo" style={{ width: 200, height: 50 }} />
+                    </CCol>
+                  </CRow>
+
+                  <CForm onSubmit={handleSubmit}>
                     <h1>Login</h1>
                     <p className="text-medium-emphasis">Sign In to your account</p>
-                    <CInputGroup className="mb-3">
-                      <CInputGroupText>
-                        <CIcon icon={cilUser} />
-                      </CInputGroupText>
-                      <CFormInput
-                        name="username"
-                        placeholder="email"
-                        type="email"
-                        value={data.username}
-                        onChange={(e) => {
-                          setData({ ...data, [e.target.name]: e.target.value })
-                        }}
-                      />
-                    </CInputGroup>
-                    <CInputGroup className="mb-4">
-                      <CInputGroupText>
-                        <CIcon icon={cilLockLocked} />
-                      </CInputGroupText>
-                      <CFormInput
-                        name="password"
-                        type="password"
-                        placeholder="Password"
-                        autoComplete="current-password"
-                        value={data.password}
-                        onChange={(e) => {
-                          setData({ ...data, [e.target.name]: e.target.value })
-                        }}
-                      />
-                    </CInputGroup>
+                    <div className="mb-3 d-flex flex-column">
+                      <CInputGroup>
+                        <CInputGroupText>
+                          <CIcon icon={cilUser} />
+                        </CInputGroupText>
+                        <CFormInput
+                          name="username"
+                          placeholder="email"
+                          type="email"
+                          value={data.username}
+                          onChange={(e) => {
+                            handleChange(e)
+                          }}
+                        />
+                      </CInputGroup>
+                      {errors.username && <small className="text-danger">{errors.username}</small>}
+                    </div>
+                    <div className="mb-3 d-flex flex-column">
+                      <CInputGroup>
+                        <CInputGroupText>
+                          <CIcon icon={cilLockLocked} />
+                        </CInputGroupText>
+                        <CFormInput
+                          name="password"
+                          type="password"
+                          placeholder="Password"
+                          autoComplete="current-password"
+                          value={data.password}
+                          onChange={(e) => {
+                            handleChange(e)
+                          }}
+                        />
+                      </CInputGroup>
+                      {errors.password && <small className="text-danger">{errors.password}</small>}
+                    </div>
                     <CRow>
                       <CCol xs={12}>
                         <CButton
+                          type="submit"
                           color="primary"
                           className="w-100 px-4"
                           disabled={isLoading}
-                          onClick={handleSubmit}
                         >
-                          Login
+                          {!isLoading ? 'Login' : <CSpinner color="success" size="sm" />}
                         </CButton>
                       </CCol>
                       {/* <CCol xs={6} className="text-right">
@@ -123,6 +201,8 @@ function Login() {
           </CCol>
         </CRow>
       </CContainer>
+
+      <CToaster ref={toaster} push={toast} placement="top-end" />
     </div>
   )
 }
