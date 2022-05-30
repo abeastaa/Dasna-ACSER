@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
 
-// ** Contexts
-import { EmailsContext } from '../../contexts/emailsContext'
-
 // ** Custom Hooks
 import useRequest from '../../utility/useRequest'
 
@@ -28,16 +25,9 @@ const Dashboard = () => {
   // ** states
   const [data, setData] = useState(null)
 
-  const { emails } = useContext(EmailsContext)
-  // ** get initial data from back-end
-  // const handleGetData = async () => {
-  //   const res = request('', 'GET')
-  //   setData(null)
-  // }
-
   useEffect(() => {
-    setData(emails)
-  }, [])
+    setData()
+  }, [data])
 
   return (
     <>

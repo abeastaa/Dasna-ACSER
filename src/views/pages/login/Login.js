@@ -2,7 +2,6 @@ import React, { useState, useContext, Suspense, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 // ** Contexts
 import { LoginContext } from '../../../contexts/loginContext'
-import { EmailsContext } from '../../../contexts/emailsContext'
 // ** Custom Hooks
 import useRequest from '../../../utility/useRequest'
 // import { useNavigate } from 'react-router-dom'
@@ -50,7 +49,6 @@ function Login() {
   const { request } = useRequest()
 
   const { setToken } = useContext(LoginContext)
-  const { setEmails } = useContext(EmailsContext)
 
   const toaster = useRef()
 
