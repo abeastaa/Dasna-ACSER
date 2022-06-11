@@ -25,6 +25,8 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
+import { EyeFill } from '@styled-icons/bootstrap/EyeFill'
+import { EyeSlash } from '@styled-icons/bootstrap/EyeSlash'
 import { CToast } from '@coreui/react'
 
 // ** Logo
@@ -56,6 +58,7 @@ function Login() {
   const [errors, setErrors] = useState({})
   const [toast, setToast] = useState(0)
   const [data, setData] = useState({ username: '', password: '' })
+  const [visiblePassword, setVisiblePassword] = useState(false)
 
   // ** Handle Change input
   const handleChange = (e) => {
@@ -142,14 +145,14 @@ function Login() {
                       </CInputGroup>
                       {errors.username && <small className="text-danger">{errors.username}</small>}
                     </div>
-                    <div className="mb-3 d-flex flex-column">
+                    <div className="mb-3 d-flex flex-column position-relative">
                       <CInputGroup>
                         <CInputGroupText>
                           <CIcon icon={cilLockLocked} />
                         </CInputGroupText>
                         <CFormInput
                           name="password"
-                          type="password"
+                          type={!visiblePassword ? 'password' : 'text'}
                           placeholder="Password"
                           autoComplete="current-password"
                           value={data.password}
@@ -158,6 +161,23 @@ function Login() {
                           }}
                         />
                       </CInputGroup>
+                      {visiblePassword ? (
+                        <EyeFill
+                          size={18}
+                          className="visible-show-icon"
+                          onClick={() => {
+                            setVisiblePassword(!visiblePassword)
+                          }}
+                        />
+                      ) : (
+                        <EyeSlash
+                          size={18}
+                          className="visible-show-icon"
+                          onClick={() => {
+                            setVisiblePassword(!visiblePassword)
+                          }}
+                        />
+                      )}
                       {errors.password && <small className="text-danger">{errors.password}</small>}
                     </div>
                     <CRow>
