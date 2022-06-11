@@ -77,15 +77,16 @@ function Login() {
       request(false, '/login', 'POST', data)
         .then((res) => {
           setIsLoading(false)
-          if (res.data.accessToken) {
+          if (res.data && res.data.accessToken) {
             localStorage.setItem('token', res.data.accessToken)
             setToken(res.data.accessToken)
             navigate('/')
           } else {
-            setToast(createToast(res.data.message))
+            setToast(createToast(res.response.data.msg))
           }
         })
         .catch((err) => {
+          console.log(err)
           if (err.response.status === 401) {
             setToast(createToast(err.response.data.msg))
           } else {

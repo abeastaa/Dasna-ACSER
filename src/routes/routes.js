@@ -32,7 +32,7 @@ function Routers() {
             <>
               <Route path="/login" name="Login Page" element={<Login />} />
               <Route path="/register" name="Register Page" element={<Register />} />
-              <Route path="*" element={<Navigate to="login" replace />} />
+              <Route path="*" element={<Navigate to="/login" replace />} />
             </>
           )}
         </Routes>
