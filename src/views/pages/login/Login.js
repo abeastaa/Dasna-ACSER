@@ -1,10 +1,6 @@
-import React, { useState, useContext, Suspense, useRef } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-// ** Contexts
-import { LoginContext } from '../../../contexts/loginContext'
-// ** Custom Hooks
-import useRequest from '../../../utility/useRequest'
-// import { useNavigate } from 'react-router-dom'
+// ** React Imports
+import React, { useState, useContext, useRef } from 'react'
+
 import {
   CButton,
   CCard,
@@ -23,6 +19,19 @@ import {
   CToaster,
   CToastHeader,
 } from '@coreui/react'
+
+// ** Contexts
+import { LoginContext } from '../../../contexts/loginContext'
+
+// ** Custom Hooks
+import useRequest from '../../../utility/useRequest'
+
+// ** Third Party Libraries
+import { Link, useNavigate } from 'react-router-dom'
+import { useFormik } from 'formik'
+import * as yup from 'yup'
+
+// ** Icons
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 import { EyeFill } from '@styled-icons/bootstrap/EyeFill'
@@ -45,74 +54,69 @@ const createToast = (text) => {
   )
 }
 
+// ** Validation Schema
+const validationSchema = yup.object({
+  email: yup.string('Enter your email').email('Enter a valid email').required('Email is required'),
+  password: yup.string('Enter your password').required('Password is required'),
+})
+
 function Login() {
   // ** Hooks
   const navigate = useNavigate()
   const { request } = useRequest()
 
+  // ** Context
   const { setToken } = useContext(LoginContext)
 
+  // ** Ref
   const toaster = useRef()
 
+  // ** States
   const [isLoading, setIsLoading] = useState(false)
-  const [errors, setErrors] = useState({})
   const [toast, setToast] = useState(0)
-  const [data, setData] = useState({ username: '', password: '' })
   const [visiblePassword, setVisiblePassword] = useState(false)
 
-  // ** Handle Change input
-  const handleChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value })
-    if (errors[e.target.name] && e.target.value.length > 0) {
-      setErrors((prev) => {
-        delete prev[e.target.name]
-        return prev
+  // ** Submit Login In Back-End
+  const handleLoginRequest = (data) => {
+    setIsLoading(true)
+    request(false, '/login', 'POST', data)
+      .then((res) => {
+        setIsLoading(false)
+        if (res.data && res.data.accessToken) {
+          localStorage.setItem('token', res.data.accessToken)
+          setToken(res.data.accessToken)
+          navigate('/')
+        } else {
+          setToast(createToast(res.response.data.msg))
+        }
       })
-    }
+      .catch((err) => {
+        setIsLoading(false)
+        if (err.response.status === 401) {
+          setToast(createToast(err.response.data.msg))
+        } else {
+          setToast(createToast('Sorry, something went wrong!'))
+        }
+      })
   }
 
-  // ** Handle Submit and login
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (Object.values(data).every((item) => item.length > 0)) {
-      setErrors({})
-      setIsLoading(true)
-      request(false, '/login', 'POST', data)
-        .then((res) => {
-          setIsLoading(false)
-          if (res.data && res.data.accessToken) {
-            localStorage.setItem('token', res.data.accessToken)
-            setToken(res.data.accessToken)
-            navigate('/')
-          } else {
-            setToast(createToast(res.response.data.msg))
-          }
-        })
-        .catch((err) => {
-          console.log(err)
-          if (err.response.status === 401) {
-            setToast(createToast(err.response.data.msg))
-          } else {
-            setToast(createToast('Sorry, something went wrong!'))
-          }
-          setIsLoading(false)
-        })
-    } else {
-      let newErrors = {}
-      for (const key in data) {
-        // console.log(key)
-        if (!data[key].length > 0) {
-          newErrors = { ...newErrors, [key]: `${key} is required` }
-        }
-        setErrors(newErrors)
-      }
-    }
-  }
+  // Formik hook
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values) => {
+      handleLoginRequest(values)
+    },
+  })
+
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
         <CRow className="justify-content-center">
-          <CCol md={6} lg={5}>
+          <CCol md={12} lg={8}>
             <CCardGroup>
               <CCard className="p-4">
                 <CCardBody>
@@ -125,42 +129,46 @@ function Login() {
                     </CCol>
                   </CRow>
 
-                  <CForm onSubmit={handleSubmit}>
+                  <CForm onSubmit={formik.handleSubmit}>
                     <h1>Login</h1>
                     <p className="text-medium-emphasis">Sign In to your account</p>
-                    <div className="mb-3 d-flex flex-column">
+                    <div className="mb-3">
                       <CInputGroup>
                         <CInputGroupText>
                           <CIcon icon={cilUser} />
                         </CInputGroupText>
                         <CFormInput
-                          name="username"
-                          placeholder="email"
-                          type="email"
-                          value={data.username}
-                          onChange={(e) => {
-                            handleChange(e)
-                          }}
+                          placeholder="Email"
+                          autoComplete="email"
+                          name="email"
+                          type="text"
+                          value={formik.values.email}
+                          onChange={formik.handleChange}
+                          // errors={formik.touched.username && Boolean(formik.errors.username)}
                         />
                       </CInputGroup>
-                      {errors.username && <small className="text-danger">{errors.username}</small>}
+                      <small className="text-danger">
+                        {formik.touched.email && formik.errors.email}
+                      </small>
                     </div>
-                    <div className="mb-3 d-flex flex-column position-relative">
+                    <div className="mb-3 position-relative">
                       <CInputGroup>
                         <CInputGroupText>
                           <CIcon icon={cilLockLocked} />
                         </CInputGroupText>
                         <CFormInput
+                          placeholder="Password"
+                          autoComplete="password"
                           name="password"
                           type={!visiblePassword ? 'password' : 'text'}
-                          placeholder="Password"
-                          autoComplete="current-password"
-                          value={data.password}
-                          onChange={(e) => {
-                            handleChange(e)
-                          }}
+                          value={formik.values.password}
+                          onChange={formik.handleChange}
+                          // errors={formik.touched.username && Boolean(formik.errors.username)}
                         />
                       </CInputGroup>
+                      <small className="text-danger">
+                        {formik.touched.password && formik.errors.password}
+                      </small>
                       {visiblePassword ? (
                         <EyeFill
                           size={18}
@@ -178,7 +186,6 @@ function Login() {
                           }}
                         />
                       )}
-                      {errors.password && <small className="text-danger">{errors.password}</small>}
                     </div>
                     <CRow>
                       <CCol xs={12}>
@@ -188,26 +195,33 @@ function Login() {
                           className="w-100 px-4"
                           disabled={isLoading}
                         >
-                          {!isLoading ? 'Login' : <CSpinner color="success" size="sm" />}
+                          Login
+                          {isLoading && <CSpinner color="success" size="sm" className="mx-1" />}
                         </CButton>
                       </CCol>
-                      {/* <CCol xs={6} className="text-right">
+                      <CCol xs={12} className="text-center">
                         <CButton color="link" className="px-0">
                           Forgot password?
                         </CButton>
-                      </CCol> */}
+                      </CCol>
+                      <CCol xs={12} className="text-center">
+                        <Link to="/register">
+                          <CButton color="link" className="text-right d-inline-block d-md-none">
+                            Register Now!
+                          </CButton>
+                        </Link>
+                      </CCol>
                     </CRow>
                   </CForm>
                 </CCardBody>
               </CCard>
-              {/* <CCard className="text-white bg-primary py-5" style={{ width: '44%' }}>
+              <CCard
+                className="text-white bg-primary py-5 d-none d-md-block"
+                style={{ width: '30%' }}
+              >
                 <CCardBody className="text-center">
                   <div>
                     <h2>Sign up</h2>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                      tempor incididunt ut labore et dolore magna aliqua.
-                    </p>
                     <Link to="/register">
                       <CButton color="primary" className="mt-3" active tabIndex={-1}>
                         Register Now!
@@ -215,7 +229,7 @@ function Login() {
                     </Link>
                   </div>
                 </CCardBody>
-              </CCard> */}
+              </CCard>
             </CCardGroup>
           </CCol>
         </CRow>
