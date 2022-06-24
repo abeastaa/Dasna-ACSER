@@ -91,13 +91,13 @@ const Dashboard = () => {
                   >
                     {data ? data.alreadyEscalated.length : 0}
                   </CBadge>
-                  <span className="text-success">ALREADY ESCALATED</span>
+                  <span className="font-size-6 text-success">ALREADY ESCALATED</span>
                 </CAccordionHeader>
                 <CAccordionBody className="mb-4 bg-success bg-opacity-25">
                   {data && data.alreadyEscalated.length ? (
                     <>
                       <div
-                        className="mb-2 text-primary"
+                        className="mb-2 text-primary font-size-6"
                         role="button"
                         onClick={() => {
                           handleSort('escalated')
@@ -116,7 +116,7 @@ const Dashboard = () => {
                       )}
                     </>
                   ) : (
-                    <span>There is no Email.</span>
+                    <span className="font-size-6">There is no Email.</span>
                   )}
                 </CAccordionBody>
               </CAccordionItem>
@@ -134,13 +134,13 @@ const Dashboard = () => {
                   >
                     {data ? data.critical.length : 0}
                   </CBadge>
-                  <span className="text-danger">CRITICAL</span>
+                  <span className="font-size-6 text-danger">CRITICAL</span>
                 </CAccordionHeader>
                 <CAccordionBody className="mb-4 bg-danger bg-opacity-25">
                   {data && data.critical.length ? (
                     <>
                       <div
-                        className="mb-2 text-primary"
+                        className="mb-2 text-primary font-size-6"
                         role="button"
                         onClick={() => {
                           handleSort('critical')
@@ -157,7 +157,7 @@ const Dashboard = () => {
                       })}
                     </>
                   ) : (
-                    <span>There is no Email.</span>
+                    <span className="font-size-6">There is no Email.</span>
                   )}
                 </CAccordionBody>
               </CAccordionItem>
@@ -175,13 +175,13 @@ const Dashboard = () => {
                   >
                     {data ? data.likelyBeEscalated.length : 0}
                   </CBadge>
-                  <span className="text-success">POTENTIAL ESCALATIONS</span>
+                  <span className="font-size-6 text-success">POTENTIAL ESCALATIONS</span>
                 </CAccordionHeader>
                 <CAccordionBody className="mb-4 bg-success bg-opacity-25">
                   {data && data.likelyBeEscalated.length ? (
                     <>
                       <div
-                        className="mb-2 text-primary"
+                        className="mb-2 text-primary font-size-6"
                         role="button"
                         onClick={() => {
                           handleSort('potential')
@@ -200,7 +200,7 @@ const Dashboard = () => {
                       )}
                     </>
                   ) : (
-                    <span>There is no Email.</span>
+                    <span className="font-size-6">There is no Email.</span>
                   )}
                 </CAccordionBody>
               </CAccordionItem>
@@ -218,13 +218,13 @@ const Dashboard = () => {
                   >
                     {data ? data.churned.length : 0}
                   </CBadge>
-                  <span className="text-warning">CHURNED</span>
+                  <span className="font-size-6 text-warning">CHURNED</span>
                 </CAccordionHeader>
                 <CAccordionBody className="mb-4 bg-warning bg-opacity-25">
                   {data && data.churned.length ? (
                     <>
                       <div
-                        className="mb-2 text-primary"
+                        className="mb-2 text-primary font-size-6"
                         ole="button"
                         onClick={() => {
                           handleSort('churned')
@@ -241,7 +241,7 @@ const Dashboard = () => {
                       })}
                     </>
                   ) : (
-                    <span>There is no Email.</span>
+                    <span className="font-size-6">There is no Email.</span>
                   )}
                 </CAccordionBody>
               </CAccordionItem>

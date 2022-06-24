@@ -43,7 +43,7 @@ import Logo from '../../../assets/images/logtrans.png'
 import NameLogo from '../../../assets/images/textlogotra.png'
 
 // ** Toast
-const createToast = (text) => {
+const createToast = (text, color) => {
   return (
     <CToast animation={true} color="danger">
       <CToastHeader closeButton className="justify-content-between">
@@ -56,7 +56,10 @@ const createToast = (text) => {
 
 // ** Validation Schema
 const validationSchema = yup.object({
-  email: yup.string('Enter your email').email('Enter a valid email').required('Email is required'),
+  username: yup
+    .string('Enter your email')
+    .email('Enter a valid email')
+    .required('Email is required'),
   password: yup.string('Enter your password').required('Password is required'),
 })
 
@@ -79,31 +82,30 @@ function Login() {
   // ** Submit Login In Back-End
   const handleLoginRequest = (data) => {
     setIsLoading(true)
-    request(false, '/login', 'POST', data)
-      .then((res) => {
-        setIsLoading(false)
-        if (res.data && res.data.accessToken) {
-          localStorage.setItem('token', res.data.accessToken)
-          setToken(res.data.accessToken)
-          navigate('/')
-        } else {
-          setToast(createToast(res.response.data.msg))
-        }
-      })
-      .catch((err) => {
-        setIsLoading(false)
-        if (err.response.status === 401) {
-          setToast(createToast(err.response.data.msg))
-        } else {
-          setToast(createToast('Sorry, something went wrong!'))
-        }
-      })
+    request(false, 'login', 'POST', data).then((res) => {
+      console.log(res)
+      if (res.status === 200 && res.data.accessToken) {
+        localStorage.setItem('token', res.data.accessToken)
+        setToken(res.data.accessToken)
+        navigate('/')
+      }
+      if (res.status === 201) {
+        setToast(createToast(res.data.msg))
+      }
+      if (res.response && res.response.status === 401) {
+        setToast(createToast(res.response.data.msg))
+      }
+      if (res.status === 500) {
+        setToast(createToast('Sorry, something went wrong!'))
+      }
+      setIsLoading(false)
+    })
   }
 
   // Formik hook
   const formik = useFormik({
     initialValues: {
-      email: '',
+      username: '',
       password: '',
     },
     validationSchema: validationSchema,
@@ -140,15 +142,15 @@ function Login() {
                         <CFormInput
                           placeholder="Email"
                           autoComplete="email"
-                          name="email"
+                          name="username"
                           type="text"
-                          value={formik.values.email}
+                          value={formik.values.username}
                           onChange={formik.handleChange}
                           // errors={formik.touched.username && Boolean(formik.errors.username)}
                         />
                       </CInputGroup>
                       <small className="text-danger">
-                        {formik.touched.email && formik.errors.email}
+                        {formik.touched.username && formik.errors.username}
                       </small>
                     </div>
                     <div className="mb-3 position-relative">
@@ -199,11 +201,11 @@ function Login() {
                           {isLoading && <CSpinner color="success" size="sm" className="mx-1" />}
                         </CButton>
                       </CCol>
-                      <CCol xs={12} className="text-center">
+                      {/* <CCol xs={12} className="text-center">
                         <CButton color="link" className="px-0">
                           Forgot password?
                         </CButton>
-                      </CCol>
+                      </CCol> */}
                       <CCol xs={12} className="text-center">
                         <Link to="/register">
                           <CButton color="link" className="text-right d-inline-block d-md-none">

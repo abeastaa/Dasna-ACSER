@@ -1,5 +1,5 @@
 // ** React Imports
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 
 // ** CoreUI Imports
 import {
@@ -14,12 +14,17 @@ import {
   CInputGroupText,
   CRow,
   CSpinner,
+  CToast,
+  CToastBody,
+  CToaster,
+  CToastHeader,
 } from '@coreui/react'
 
 // ** Custom Hooks
 import useRequest from '../../../utility/useRequest'
 
 // ** Third Party Libraries
+import { Link, useNavigate } from 'react-router-dom'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
 
@@ -31,6 +36,16 @@ import { AtSign } from '@styled-icons/foundation/AtSign'
 // ** Logo
 import Logo from '../../../assets/images/logtrans.png'
 import NameLogo from '../../../assets/images/textlogotra.png'
+import { setInterval } from 'core-js'
+
+// ** Toast
+const createToast = (text, color) => {
+  return (
+    <CToast animation={true} color={color}>
+      <CToastBody className="text-white">{text}</CToastBody>
+    </CToast>
+  )
+}
 
 // ** Validation Schema
 const validationSchema = yup.object({
@@ -41,33 +56,32 @@ const validationSchema = yup.object({
 const Register = () => {
   // **  Hooks
   const { request } = useRequest()
+  const navigate = useNavigate()
 
   // States
   const [isLoading, setIsLoading] = useState(false)
+  const [toast, setToast] = useState(0)
+
+  // ** Ref
+  const toaster = useRef()
 
   // ** Submit Register In Back-End
-  const handleRegisterRequest = (data) => {
-    request(false, '/register', 'POST', data)
+  const handleRegisterRequest = async (data) => {
     setIsLoading(true)
-
-    // .then((res) => {
-    //   setIsLoading(false)
-    //   if (res.data && res.data.accessToken) {
-    //     localStorage.setItem('token', res.data.accessToken)
-    //     setToken(res.data.accessToken)
-    //     navigate('/')
-    //   } else {
-    //     setToast(createToast(res.response.data.msg))
-    //   }
-    // })
-    // .catch((err) => {
-    //   setIsLoading(false)
-    //   if (err.response.status === 401) {
-    //     setToast(createToast(err.response.data.msg))
-    //   } else {
-    //     setToast(createToast('Sorry, something went wrong!'))
-    //   }
-    // })
+    await request(false, 'register', 'POST', data)
+      .then((res) => {
+        if (res.status === 200 || res.status === 207) {
+          setToast(createToast(res.data.msg, res.status === 200 ? 'success' : 'warning'))
+          setInterval(() => {
+            window.location.replace('/login')
+          }, 2000)
+        }
+        setIsLoading(false)
+      })
+      .catch((err) => {
+        setToast(createToast('Something went wrong', 'danger'))
+        setIsLoading(false)
+      })
   }
 
   // Formik hook
@@ -86,7 +100,7 @@ const Register = () => {
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
         <CRow className="justify-content-center">
-          <CCol md={7} lg={5} xl={4}>
+          <CCol md={7} lg={6} xl={5}>
             <CCard className="mx-2">
               <CCardBody className="p-4">
                 <div className="mb-5">
@@ -143,12 +157,16 @@ const Register = () => {
                       {isLoading && <CSpinner color="dark" size="sm" className="mx-1" />}
                     </CButton>
                   </div>
+                  <div className="my-2 d-flex justify-content-center">
+                    <Link to="/login">Back To Login</Link>
+                  </div>
                 </CForm>
               </CCardBody>
             </CCard>
           </CCol>
         </CRow>
       </CContainer>
+      <CToaster ref={toaster} push={toast} placement="top-end" />
     </div>
   )
 }

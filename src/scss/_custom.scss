@@ -1,8 +1,46 @@
 // Here you can add other styles
+@font-face {
+    font-family: 'SignikaNegative-Regular';
+    src: url(../assets/fonts/SignikaNegative-Regular.ttf);
+}
+
+@font-face {
+    font-family: weknowTwo;
+    src: url(../assets/fonts/WeknowWindows2.ttf);
+}
+
+@font-face {
+    font-family: 'Kanit-Regular';
+    src: url(../assets/fonts/Kanit-Regular.ttf);
+}
+
+body {
+    font-family: 'SignikaNegative-Regular', 'Kanit-Regular', 'weknowTwo';
+}
+
 .visible-show-icon {
     position: absolute;
     top: 10px;
     right: 10px;
     cursor: pointer;
     z-index: 10;
+}
+ 
+.font-size-1 {
+    font-size: 2.5rem
+}
+.font-size-2 {
+    font-size: 2rem
+}
+.font-size-3 {
+    font-size: 1.75rem
+}
+.font-size-4 {
+    font-size: 1.25rem
+}
+.font-size-5 {
+    font-size: 1rem
+}
+.font-size-6 {
+    font-size: 0.75rem
 }

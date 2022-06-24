@@ -38,9 +38,8 @@ function EmailCard({ data }) {
     const newDate = new Date(date)
     return (
       <>
-        <small>{newDate.toDateString()}</small>
-        <br />
-        <small>{newDate.toLocaleTimeString()}</small>
+        <p className="font-size-6 m-0">{newDate.toDateString()}</p>
+        <p className="font-size-6 m-0">{newDate.toLocaleTimeString()}</p>
       </>
     )
   }
@@ -49,11 +48,12 @@ function EmailCard({ data }) {
     <>
       <CCard className="mb-4">
         <CCardHeader className="d-flex justify-content-between">
-          <span className="font-weight-bold">{data.title}</span>
+          <span className="font-size-6 font-weight-bold">{data.title}</span>
           <CBadge
             color={handleBadge(data.criticality).color}
             shape="rounded-pill"
-            className="px-3 d-flex align-items-center "
+            className="px-2 d-flex align-items-center "
+            style={{ height: 30 }}
           >
             {handleBadge(data.criticality).label}
           </CBadge>
@@ -64,18 +64,20 @@ function EmailCard({ data }) {
               <QuoteAltLeft height={42} className="text-secondary" />
             </CCol>
             <CCol xs={9} className="p-0">
-              <p>{data.keyWords}</p>
+              <p className="font-size-6 m-0">{data.keyWords}</p>
             </CCol>
           </CRow>
-          <CRow className="d-flex align-items-start justify-content-between">
-            <CCol sm={7}>
-              <span>
-                <MailSend height={18} className="mx-1 mb-1" />
+          <CRow className="d-flex align-items-end justify-content-between mt-2">
+            <CCol sm={6} className="d-flex flex-column justify-content-end">
+              <p className="font-size-6 m-0">
+                <MailSend height={18} className="mx-1" />
                 Sender
-              </span>
-              <h6>{data.sender}</h6>
+              </p>
+              <p style={{ fontWeight: 'bold' }} className="font-size-6 m-0">
+                {data.sender}
+              </p>
             </CCol>
-            <CCol sm={5}>{handleDateTime(data.date)}</CCol>
+            <CCol sm={6}>{handleDateTime(data.date)}</CCol>
           </CRow>
         </CCardBody>
       </CCard>

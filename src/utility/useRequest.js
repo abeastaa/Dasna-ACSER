@@ -19,7 +19,7 @@ export default function useRequest() {
         ...headers,
       },
       params: requestParams,
-      timeout: 1000 * 15,
+      timeout: 1000 * 90,
     })
       .then((res) => {
         return res
